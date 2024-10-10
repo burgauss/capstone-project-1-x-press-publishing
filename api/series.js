@@ -1,8 +1,12 @@
 const express = require('express');
 const sqlite = require('sqlite3');
+const issuesRouter = require('./issues.js');
 
 const db = new sqlite.Database(process.env.TEST_DATABASE || './database.sqlite');
 const seriesRouter = express.Router();
+
+seriesRouter.use('/:seriesId/issues', issuesRouter)
+
 
 seriesRouter.get('/', (req, res, next) =>{
     db.all("SELECT * FROM Series", (err, series) => {
