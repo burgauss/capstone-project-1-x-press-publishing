@@ -1,7 +1,7 @@
 const express = require('express');
 const sqlite = require('sqlite3');
 
-const db = new sqlite.Database(process.env.TEST_DATABASE || '../database.sqlite');
+const db = new sqlite.Database(process.env.TEST_DATABASE || './database.sqlite');
 const artistsRouter = express.Router();
 
 artistsRouter.get('/', (req, res, next) =>{
@@ -88,7 +88,7 @@ artistsRouter.delete('/:artistId', (req, res, next) =>{
                 });
         }
     )
-})
+});
 
 artistsRouter.post('/', validateArtist, (req, res, next) => {
     const {name, dateOfBirth, biography} = req.body.artist;
