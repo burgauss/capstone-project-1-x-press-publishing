@@ -17,22 +17,6 @@ artistsRouter.get('/', (req, res, next) =>{
     })
 });
 
-// artistsRouter.use('/:artistId', (req, res, next) => {
-//     db.get("SELECT * FROM Artist WHERE id = $id", {$id:req.params.artistId}, (err,artist)=>{
-//         if(err){
-//             console.log("Something went wrong when validating the existence of the artist");
-//             console.log(err);
-//             return res.sendStatus(500);
-//         } else{
-//             if(artist) {
-//                 next()
-//             } else{
-//                 req.artist = artist;
-//                 return res.status(404).send();
-//             }
-//         }
-//     })
-// });
 
 artistsRouter.param('artistId', (req, res, next, id) =>{
     db.get("SELECT * FROM Artist WHERE id = $id", {$id:id}, (err, artist) =>{
