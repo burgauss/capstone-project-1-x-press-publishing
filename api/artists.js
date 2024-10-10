@@ -88,16 +88,15 @@ artistsRouter.put('/:artistId', validateArtist, (req, res, next) => {
 });
 
 artistsRouter.delete('/:artistId', (req, res, next) =>{
-    db.run(`UPDATE Artist SET is_currently_employed = $isCurrentlyEmployed WHERE id=$id`,
+    db.run(`UPDATE Artist SET is_currently_employed = 0 WHERE id=$id`,
         {
-            $isCurrentlyEmployed: 0,
             $id: req.artist.id
         }, function(error) {
             if (error){
                 next(error);
                 return res.status(500).send();
             }
-            db.get(`SELECT * FROM Artist WHERE id = ${req.artist.id}`, (err, artist) => {
+                       db.get(`SELECT * FROM Artist WHERE id = ${req.artist.id}`, (err, artist) => {
                 if (!artist) {
                     return res.sendStatus(500);
                 }
