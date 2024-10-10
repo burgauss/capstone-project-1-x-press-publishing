@@ -60,35 +60,31 @@ artistsRouter.get('/:artistId', (req, res, next) => {
     res.send({artist: req.artist});
 });
 
-artistsRouter.put('/:artistId', (req, res, next) => {
+// artistsRouter.put('/:artistId', (req, res, next) => {
 
-});
+// });
 
 // artistsRouter.delete()
 
-artistsRouter.post('/', (req, res, next) => {
+artistsRouter.post('/', validateArtist, (req, res, next) => {
     const {name, dateOfBirth, biography} = req.body.artist;
     const isCurrentlyEmployed = req.body.artist.isCurrentlyEmployed === 0 ? 0 : 1 ;
 
-    if (!name || !dateOfBirth || !biography){
-        return res.status(400).send();
-    } else{
-        db.run(`INSERT INTO Artist (name, date_of_birth, biography, is_currently_employed) 
-            VALUES ($name, $date_of_birth, $biography, $is_currently_employed)`,
-            {$name: name, $date_of_birth: dateOfBirth, $biography: biography, $is_currently_employed:isCurrentlyEmployed}, 
-        function(error) {
-            if (error){
-                next(error);
-                return res.status(500).send();
+    db.run(`INSERT INTO Artist (name, date_of_birth, biography, is_currently_employed) 
+        VALUES ($name, $date_of_birth, $biography, $is_currently_employed)`,
+        {$name: name, $date_of_birth: dateOfBirth, $biography: biography, $is_currently_employed:isCurrentlyEmployed}, 
+    function(error) {
+        if (error){
+            next(error);
+            return res.status(500).send();
+        }
+        db.get(`SELECT * FROM Artist WHERE id = ${this.lastID}`, (err, artist) => {
+            if (!artist) {
+                return res.sendStatus(500);
             }
-            db.get(`SELECT * FROM Artist WHERE id = ${this.lastID}`, (err, artist) => {
-                if (!artist) {
-                  return res.sendStatus(500);
-                }
-                res.status(201).send({artist: artist});
-              });
-        })
-    }
+            res.status(201).send({artist: artist});
+            });
+    })
 });
 
 module.exports = artistsRouter;
