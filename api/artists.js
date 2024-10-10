@@ -41,7 +41,7 @@ artistsRouter.param('artistId', (req, res, next, id) =>{
         } 
         if (artist){
             req.artist = artist;
-            next()
+            next();
         } else{
             return res.status(404).send("The artist was not found");
         }
@@ -60,9 +60,32 @@ artistsRouter.get('/:artistId', (req, res, next) => {
     res.send({artist: req.artist});
 });
 
-// artistsRouter.put('/:artistId', (req, res, next) => {
-
-// });
+artistsRouter.put('/:artistId', validateArtist, (req, res, next) => {
+    const {name, dateOfBirth, biography} = req.body.artist;
+    const isCurrentlyEmployed = req.body.artist.isCurrentlyEmployed === 0 ? 0 : 1 ;
+    db.run(`UPDATE Artist SET name = $name,
+         date_of_birth = $dateOfBirth, 
+         biography = $biography, 
+         is_currently_employed=$isCurrentlyEmployed 
+         WHERE id = $id`, {
+            $name : name,
+            $dateOfBirth : dateOfBirth,
+            $biography : biography,
+            $isCurrentlyEmployed  : isCurrentlyEmployed,
+            $id: req.artist.id
+        }, function(error) {
+            if (error){
+                next(error);
+                return res.status(500).send();
+            }
+            db.get(`SELECT * FROM Artist WHERE id = ${req.artist.id}`, (err, artist) => {
+                if (!artist) {
+                    return res.sendStatus(500);
+                }
+                res.status(200).send({artist: artist});
+                });
+        })
+});
 
 // artistsRouter.delete()
 
