@@ -5,21 +5,6 @@ const issuesRouter = require('./issues.js');
 const db = new sqlite.Database(process.env.TEST_DATABASE || './database.sqlite');
 const seriesRouter = express.Router();
 
-seriesRouter.use('/:seriesId/issues', issuesRouter)
-
-
-seriesRouter.get('/', (req, res, next) =>{
-    db.all("SELECT * FROM Series", (err, series) => {
-        if(err){
-            next(err);
-            return res.sendStatus(500);
-        } else{
-            res.status(200).send({series: series});
-        }
-
-    })
-});
-
 seriesRouter.param('seriesId', (req, res, next, id) =>{
     db.get("SELECT * FROM Series WHERE id = $id", {$id:id}, (err, serie) =>{
         if (err){
@@ -33,6 +18,21 @@ seriesRouter.param('seriesId', (req, res, next, id) =>{
         }
     })  
 })
+
+seriesRouter.use('/:seriesId/issues', issuesRouter)
+
+seriesRouter.get('/', (req, res, next) =>{
+    db.all("SELECT * FROM Series", (err, series) => {
+        if(err){
+            next(err);
+            return res.sendStatus(500);
+        } else{
+            res.status(200).send({series: series});
+        }
+
+    })
+});
+
 
 const validateSerie = (req,res,next) => {
     const {name, description} = req.body.series;
